@@ -3,13 +3,12 @@ const nodemailer = require('nodemailer');
 const app = express();
 app.use(express.json());
 
-// Variáveis de ambiente
 const emailFrom = process.env.EMAIL_FROM;
 const emailPass = process.env.EMAIL_PASS;
 const emailTo = process.env.EMAIL_TO;
 
 const transporter = nodemailer.createTransport({
-  service: 'Outlook', // ou Gmail, se estiver usando Google
+  service: 'Gmail',
   auth: {
     user: emailFrom,
     pass: emailPass
@@ -21,9 +20,9 @@ app.post('/notificar-erro', async (req, res) => {
 
   try {
     await transporter.sendMail({
-      from: `"Notificação Power BI" <${emailFrom}>`,
+      from: `"Alerta Power BI" <${emailFrom}>`,
       to: emailTo,
-      subject: 'Erro ao carregar Power BI',
+      subject: '🚨 Erro no Power BI',
       text: mensagem
     });
 
@@ -35,7 +34,7 @@ app.post('/notificar-erro', async (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.send('Servidor de notificação por e-mail está rodando.');
+  res.send('Servidor de notificação via Gmail funcionando!');
 });
 
 const port = process.env.PORT || 3000;
