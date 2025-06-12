@@ -15,7 +15,7 @@ app.post('/notificar-erro', async (req, res) => {
 
   const msg = {
     to: emailTo,
-    from: emailFrom, // <-- corrigido aqui
+    from: { email: emailFrom }, // ✅ formato correto exigido pela API
     subject: '🚨 Erro no Power BI',
     text: mensagem,
   };
