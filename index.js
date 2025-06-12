@@ -1,17 +1,15 @@
 const express = require('express');
 const nodemailer = require('nodemailer');
-const axios = require('axios');
 const app = express();
 app.use(express.json());
 
-// ENV: EMAIL, SENHA E WEBHOOK
+// Variáveis de ambiente
 const emailFrom = process.env.EMAIL_FROM;
 const emailPass = process.env.EMAIL_PASS;
 const emailTo = process.env.EMAIL_TO;
-const webhookTeams = process.env.TEAMS_WEBHOOK;
 
 const transporter = nodemailer.createTransport({
-  service: 'Outlook',
+  service: 'Outlook', // ou Gmail, se estiver usando Google
   auth: {
     user: emailFrom,
     pass: emailPass
@@ -22,10 +20,6 @@ app.post('/notificar-erro', async (req, res) => {
   const { mensagem } = req.body;
 
   try {
-    // Enviar Teams
-    await axios.post(webhookTeams, { text: `🚨 ${mensagem}` });
-
-    // Enviar Email
     await transporter.sendMail({
       from: `"Notificação Power BI" <${emailFrom}>`,
       to: emailTo,
@@ -33,15 +27,15 @@ app.post('/notificar-erro', async (req, res) => {
       text: mensagem
     });
 
-    res.status(200).send('Notificações enviadas.');
+    res.status(200).send('E-mail enviado com sucesso.');
   } catch (err) {
-    console.error('Erro ao enviar notificações:', err.message);
-    res.status(500).send('Falha ao notificar.');
+    console.error('Erro ao enviar e-mail:', err.message);
+    res.status(500).send('Falha ao enviar e-mail.');
   }
 });
 
 app.get('/', (req, res) => {
-  res.send('Servidor de Notificação Power BI rodando!');
+  res.send('Servidor de notificação por e-mail está rodando.');
 });
 
 const port = process.env.PORT || 3000;
