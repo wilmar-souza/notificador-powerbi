@@ -1,36 +1,28 @@
 const express = require('express');
-const sgMail = require('@sendgrid/mail');
+const axios = require('axios');
 const app = express();
 app.use(express.json());
 
-// Variáveis de ambiente
-const sendgridApiKey = process.env.SENDGRID_API_KEY;
-const emailFrom = process.env.EMAIL_FROM;
-const emailTo = process.env.EMAIL_TO;
-
-sgMail.setApiKey(sendgridApiKey);
+const webhookUrl = process.env.TEAMS_WEBHOOK;
 
 app.post('/notificar-erro', async (req, res) => {
   const { mensagem } = req.body;
 
-  const msg = {
-    to: emailTo,
-    from: { email: emailFrom }, // ✅ formato correto exigido pela API
-    subject: '🚨 Erro no Power BI',
-    text: mensagem,
+  const payload = {
+    text: mensagem
   };
 
   try {
-    await sgMail.send(msg);
-    res.status(200).send('E-mail enviado com sucesso via SendGrid.');
+    await axios.post(webhookUrl, payload);
+    res.status(200).send('Notificação enviada para o Teams.');
   } catch (err) {
-    console.error('Erro ao enviar e-mail:', err.response?.body || err.message);
-    res.status(500).send('Falha ao enviar e-mail.');
+    console.error('Erro ao enviar para o Teams:', err.response?.data || err.message);
+    res.status(500).send('Falha ao enviar notificação.');
   }
 });
 
 app.get('/', (req, res) => {
-  res.send('Servidor de notificação via SendGrid rodando!');
+  res.send('Servidor de notificação via Microsoft Teams rodando!');
 });
 
 const port = process.env.PORT || 3000;
